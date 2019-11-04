@@ -1,0 +1,36 @@
+Thank you for using Gen.O2.profile !
+
+This manual will briefly explain how to use the script. There are 4 required inputs for the script in order to run.
+
+
+"N" ,The amount of data points you want to model.
+"L" , The depth of the sediment you want to model in meters 
+for more info on these two parameters check the functions "tran.1D","setup.grid.1D" in the package reactran
+
+"por", the porosity of your sediment otherwise known as the volume fraction of the sediment that consists of water, a value between 0 and 1
+
+Then either 
+
+Flux.top or O2.ow needs to be given in units mmol m^-2 day^-1 and mmol m^-3 respectively
+
+Flux top is the flux at the water sediment interface, O2.ow is the oxygen concentration of the overlying water
+
+The other arguments are optional
+
+S,P and TC are all inputs to derive the diffusion coefficient , see package "marelac" for more info
+Ks is the half saturation constant given in mmol m^-3
+R.O2 is the consumption rate in mmol m^-3 day^-1
+
+
+OUTPUT:
+
+The output will consist of an 
+ID=1 since flux.comp needs this to work.
+x.cor or the "corrected depth" in micrometer
+C concentration O2 in mmol m^-3
+Por as in the porosity
+T temperature in celsius
+S salinity
+P pressure in pascale
+Author = "Luna.gen profile" indicating its an generated profile
+True.Flux , either the inputted flux or the flux calculated from steady state when concentration of the overlying water is given

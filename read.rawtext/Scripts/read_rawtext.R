@@ -41,6 +41,4 @@ return(the.data)
 
 }
 
-df.temp<-read.rawtext("./Data/TOU data/Braeckman_2014 RAW.tab" )
-
 

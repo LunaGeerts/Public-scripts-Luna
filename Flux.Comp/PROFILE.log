@@ -1,0 +1,47 @@
+ Name of input file : ID1.inp                                           
+ Name of output file: Profile results ID1.txt                           
+
+ Input read from file - the calculation begins.
+
+
+ Zones     SSE   R**2  Zones:  2     3     4     5     6     7
+
+   1 .3136E+04  .6513 ----  .000  .000  .000  .000  .000  .000
+   2 .9602E+03  .8932 ----------  .000  .000  .000  .000  .000
+   3 .9222E+02  .9897 ----------------  .000  .000  .000  .000
+   4 .6265E+01  .9993 ----------------------  .000  .000  .000
+   5 .3786E+01  .9996 ----------------------------  .000  .000
+   6 .2570E+01  .9997 ----------------------------------  .001
+   7 .2166E+01  .9998
+
+ The F statistics have no suggestion. Choose the number of zones for further
+ calculations:  5
+
+
+ Zones     SSE   R**2  Zones:  4     3     2     1
+
+   5 .3786E+01  .9996 ---- 1.000
+   4 .3786E+01  .9996 ---------- 1.000
+   3 .3786E+01  .9996 ----------------  .000
+   2 .9155E+02  .9898 ----------------------  .000
+   1 .3136E+04  .6513
+
+ The F statistics suggest  3 zones. Choose the number of zones in
+ final result:  3
+
+ The calculation is done -     83381 steady state profiles are tested.
+
+
+ Calculated concentration at top   :  .3458E+02
+ Calculated concentration at bottom:  .0000E+00
+ Calculated flux at top            :  .2798E-02
+ Calculated flux at bottom         : -.3033E-17
+ Depth integration of production   : -.2798E-02
+ Depth integration of irrigation   :  .0000E+00
+
+ Depth integration of production and irrigation in each zone:
+
+                           Zones     Production   Irrigation
+                             1       -.2316E-02    .0000E+00
+                             2       -.4816E-03    .0000E+00
+                             3       -.1071E-19    .0000E+00

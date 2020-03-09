@@ -22,7 +22,8 @@
 ################################################################################
 #NEW IN V2
 ################################################################################
-#You can now specify if you want to save the plot files as a png or EPS 
+#You can now specify if you want to save the plot files as a "wmf", "emf", "png", "jpg", "jpeg", "bmp",
+# "tif", "tiff", "ps", "eps", "pdf" - type file. png is the default
 #Also Flux.Comp now works properly with Gen_O2_Profile and can create an additional plot with the true flux and
 #consumption given that the appropriate consumptions and fluxes are given!
 
@@ -66,11 +67,12 @@
 
 
 
-Flux.CompV2<-function(Data.frame.name,
+Flux.Comp<-function(Data.frame.name,
                     IDs.to.analyse=NULL,
                     Filepathplot=NULL,
                     Filepathresults=NULL,
                     PROFILE.files=TRUE,
+                    Plot_type= "png",
                     Species="O2", 
                     Gen_O2_int= TRUE ){
 
@@ -91,7 +93,15 @@ if (is.null(Filepathresults)){Filepathresults=paste( getwd(),
   
   
   df.temp  <-as.data.frame(Data.frame.name)
-
+  if(Gen_O2_int) {
+   if( !(exists("True.Flux",df.temp))) 
+      
+     {stop("No True.Flux collumn found in input data, either change Gen_O2_int to FALSE or provide appropriate fluxes")} 
+    
+   if( !(exists("Production",df.temp)))
+     
+     {stop("No Production collumn found in input data, either change Gen_O2_int to FALSE or provide appropriate production")} 
+  }
 #Now to give an error if any of the environmental parameters per ID have (which stretch over the whole ID)
 
 #I have the feeling this can be made much more efficient but not sure how...  
@@ -519,14 +529,14 @@ try  (    plot.true(depth = testgradient$input$user.input$x,
   
   
   if(is.character(Filepathplot)){
-  name<-paste("/plots ID",i,".png",sep = "")
+  name<-paste("/plots ID",i,".",Plot_type,sep = "")
   #Still make a function where one can specify where the plots should be written to for now its a junk folder to not
   #overwrite past plots and if no folder is given that it should just keep the plot open for easy comparison
   
   path<-paste(Filepathplot ,sep="")
   pathing<-paste(path,name,sep="")
   
-  savePlot(filename=pathing,type="png")
+  savePlot(filename=pathing,type = Plot_type)
   
   }
   ##These two are to remove clutter, otherwise you end up with a dozen of files in your working directory   

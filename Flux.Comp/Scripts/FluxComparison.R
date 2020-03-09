@@ -8,7 +8,7 @@
 ##  Written by: Luna Geerts
 ##  Contact: Luna.Geerts@hotmail.com 
 ##  
-##  version 0.1
+##  version 0.2
 ##
 ################################################################################
 #NOTES
@@ -18,8 +18,25 @@
 #These two methods only allow calculations with a constant Diffusivity (for which you need temperature salinity etc)
 #See "?diffcoeff" for more info
 
+
+################################################################################
+#NEW IN V2
+################################################################################
+#You can now specify if you want to save the plot files as a png or EPS 
+#Also Flux.Comp now works properly with Gen_O2_Profile and can create an additional plot with the true flux and
+#consumption given that the appropriate consumptions and fluxes are given!
+
+
 #NOTA BINNING
 
+
+
+################################################################################
+#Bugs
+################################################################################
+
+#If a varaiable T is named or used we get an error related to PROFILE since there we say intern=T and if we assign
+#a value to T... yeaaahhh
 
 
 ################################################################################
@@ -34,7 +51,7 @@
 # ID ,where seperated from one another via ID's.
 # A collumn "x.cor", if no correction of depth has to take place simply name the depth collumn "x.cor" 
 # UNITS: MICROMETERS
-# C with the oxygen concentration UNITS:x
+# C with the oxygen concentration UNITS:mmol m^-3
 
 #this is the bare minimum, it is advised you also provide a collumn with:
 #T , temperature (only first value is considered)
@@ -49,12 +66,13 @@
 
 
 
-Flux.Comp<-function(Data.frame.name,
+Flux.CompV2<-function(Data.frame.name,
                     IDs.to.analyse=NULL,
                     Filepathplot=NULL,
                     Filepathresults=NULL,
                     PROFILE.files=TRUE,
-                    Species="O2"){
+                    Species="O2", 
+                    Gen_O2_int= TRUE ){
 
 
 #Get the dependencies out of the way  
@@ -80,9 +98,9 @@ if (is.null(Filepathresults)){Filepathresults=paste( getwd(),
 for (i in IDs.to.analyse) {
   
   
-  if( length(  unique( df.temp$T  [df.temp$ID==i] ))>1) {stop(paste("Temperature in ID",i,"contains multiple values")) }
-  if( length(  unique( df.temp$Sal  [df.temp$ID==i] ))>1) {stop(paste("Salinity in ID",i,"contains multiple values")) }
-  if( length(  unique( df.temp$Press  [df.temp$ID==i] ))>1) {stop(paste("Pressure in ID",i,"contains multiple values")) }
+  if( length(  unique( df.temp$TC  [df.temp$ID==i] ))>1) {stop(paste("Temperature in ID",i,"contains multiple values")) }
+  if( length(  unique( df.temp$S  [df.temp$ID==i] ))>1) {stop(paste("Salinity in ID",i,"contains multiple values")) }
+  if( length(  unique( df.temp$P  [df.temp$ID==i] ))>1) {stop(paste("Pressure in ID",i,"contains multiple values")) }
   if( length(  unique( df.temp$z  [df.temp$ID==i] ))>1) {stop(paste("Z in ID",i,"contains multiple values")) }
   if( length(  unique( df.temp$Dmol  [df.temp$ID==i] ))>1) {stop(paste("Dmol in ID",i,"contains multiple values")) }
   if( length(  unique( df.temp$Ds  [df.temp$ID==i] ))>1) {stop(paste("Ds in ID",i,"contains multiple values")) }
@@ -114,8 +132,8 @@ for (i in IDs.to.analyse) {
   
   ForFLIPPER<-NULL
   ForFLIPPER$env.parms <- list(TC    = df.temp$T[df.temp$ID==i][1],
-                               S     = df.temp$Sal[df.temp$ID==i][1],
-                               P     = df.temp$Press[df.temp$ID==i][1],
+                               S     = df.temp$S[df.temp$ID==i][1],
+                               P     = df.temp$P[df.temp$ID==i][1],
                                z     = df.temp$z[df.temp$ID==i][1],
                                Dmol  = df.temp$Dmol[df.temp$ID==i][1],
                                Ds    = df.temp$Ds[df.temp$ID==i][1],
@@ -405,7 +423,99 @@ for (i in IDs.to.analyse) {
     
     
   }
+######################################################################  
+  #PART THAT INCLUDES THE ACTUAL TRUE FLUX AS WELL AS CONSUMPTION
+######################################################################  
   
+  if(Gen_O2_int) {
+  mat$True.Flux[mat$ID==i]<-df.temp$True.Flux[df.temp$ID==i][1]
+  
+  if(Gen_O2_int){
+    
+
+    
+    df.R                     <- data.frame           (x     = (df.temp$x.cor[df.temp$ID==i]*10^-6), #To correct micrometers back to meters
+                                                     C     = df.temp$C[df.temp$ID==i],
+                                                     por   = df.temp$Por[df.temp$ID==i],
+                                                     ID    = df.temp$ID[df.temp$ID==i],
+                                                     Prod  = df.temp$Production[df.temp$ID==i], #I put in my model CONSUMPTIOn but for plotting
+                                                     #we need PRODUCTION hence the negative!
+                                                     True.Flux = df.temp$True.Flux[df.temp$ID==i]) 
+ 
+    
+    approx_Prod              <- approx(x = df.R$x , y = df.R$Prod , xout =   testgradient$input$continuous.input$x)$y
+    approx_flux              <- approx(x = df.R$x , y = df.R$True.Flux , xout =   testgradient$input$continuous.input$x)$y
+    
+        
+    True_flux_data           <- data.frame           (x        = testgradient$input$continuous.input$x,
+                                                     C         = testgradient$input$continuous.input$C,
+                                                     True.Flux = approx_flux,
+                                                     Prod      = approx_Prod)
+    
+    
+  
+
+plot.true <- function(depth, conc, modelfit, R.int=NULL, y.limits = NULL, 
+                              prod.limits = NULL, flux.limits = NULL, conc.limits = NULL){
+    
+    flux         <- modelfit$True.Flux
+    prod         <- modelfit$Prod
+    model.depth  <- modelfit$x
+    
+    if(is.null(y.limits))    y.limits <- c(max(depth, na.rm=T)*1.25,min(depth, na.rm = T)*0.75)
+    
+    if(is.null(prod.limits)) prod.limits <- c(range(c(prod*1.25,prod*0.75)))
+    if(prod.limits[1]>0) prod.limits[1] <- 0
+    if(prod.limits[2]<0) prod.limits[2] <- 0
+    
+    if(is.null(conc.limits)) conc.limits <- c(range(c(conc*1.25,conc*0.75)))
+    if(is.null(flux.limits)) flux.limits <- c(range(c(flux*1.25,flux*0.75)))
+    
+    
+    par(new=F)
+    
+    plot(x=conc, y=depth, ylim=y.limits, pch=21, cex=1, bg=gray(level=0.2), xlab="",ylab="", axes=F,
+         xlim = conc.limits)
+    lines(x=modelfit[,2], y=modelfit[,1], lwd=2, lty=1, col="red")
+    
+    axis(1, cex.axis=1.2, lwd=1.5, pos=par()$yaxp[1])
+    #abline(h=par()$yaxp[1])
+    
+    mtext(side=1, line=2.5, "Concentration", cex=1.5)
+    axis(2, cex.axis=1.2, lwd=1.5, pos=conc.limits[1])
+    mtext(side=2, line=1.5, "Depth", cex=1.5)
+    
+    abline(h=0, lty=1)  
+    
+    par(new=T)
+    
+    plot(x=prod, y=model.depth, ylim=y.limits, lwd=2, lty=2, 
+         xlab="",ylab="", axes=F, xlim = prod.limits, type="l")
+    
+    
+    
+    #abline(v=0)
+    
+    axis(3, cex.axis=1.2, lwd=1.5)
+    # abline(h=par()$yaxp[2])
+    mtext(text="Production", side=3, line=2.5, cex=1.5, lwd=1.5)
+    
+    if(!is.null(R.int)){
+      text(y=max(depth), x=mean(prod.limits), adj=c(0,0),
+           paste("TRUE Flux \nR.int =",round(R.int,3)), cex=1.5)}
+    
+    
+    
+  }
+
+
+try  (    plot.true(depth = testgradient$input$user.input$x,
+          conc  = testgradient$input$user.input$C,
+          modelfit = True_flux_data,
+          R.int = True_flux_data$True.Flux))
+  }
+  
+  }
   
   
   if(is.character(Filepathplot)){

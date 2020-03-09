@@ -81,17 +81,16 @@ require(marelac)
 
 
 
-Gen.O2.Profile<- function(N,
-                          L, #length in METERS
-                          por,
+Gen.O2.Profile<- function(N,                       # #datapoints
+                          L,                       # length in METERS
+                          por,                     # Porosity
                           Flux.top=NULL,           #  mmol m^-2 day^-1
-                          O2.ow= NULL,
-                          S  = 35,
-                          P  = 1.013253,
-                          TC = 25,
-                          Ks = NULL,
-                          
-                          R.O2 = NULL
+                          O2.ow= NULL,             # concentration overlying water
+                          S  = 35,                 # Salinity no units  
+                          P  = 1.013253,           # Pressure in bars
+                          TC = 25,                 # Temperature in degrees Celsius
+                          Ks = NULL,               # Half saturation constant (monod)
+                          R.O2 = NULL              # Oxygen consumption 
                           ) {
 
 if(is.null(O2.ow)) {water.given<-FALSE } else {water.given<-TRUE}
@@ -134,7 +133,7 @@ reaction.O2    <- Consumption.O2
     dC.O2.dt       <- tran.O2+reaction.O2
 
     
-    return(list(dC.O2.dt=dC.O2.dt))
+    return(list(dC.O2.dt=dC.O2.dt, production =  Consumption.O2))
   }  )}
                     
 
@@ -194,6 +193,8 @@ out <- steady.1D(y=state, func=O2.model, parms=parm, nspec=1)
 
 steady.state.reached <- attributes(out)$steady
 if (steady.state.reached) {O2.SS <- out$y} else stop
+if (steady.state.reached) {Prod.SS <- out$production} else stop
+
 
 #in units mmol per liter or micromol per square cm
 
@@ -218,7 +219,9 @@ Gen.oxygenprofile<-data.frame(ID     = 1,
                               S      = S,
                               P      = P,
                               Author = "Luna.gen profile",
-                              True.Flux=True.flux )
+                              R.O2= R.O2,
+                              True.Flux=True.flux,
+                              Production= Prod.SS )
 return(Gen.oxygenprofile)
 
 }

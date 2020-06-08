@@ -8,11 +8,12 @@ source("./Scripts/FluxComparison.R")
 
 #Example
 
-x<-Flux.Comp(Test,IDs.to.analyse = 18)
+Test_adj<- Test[Test$x.cor>=0,] #currently Continuous method can only handly positive values
 
-#Example running without Temperature input and with file locations specified. for series of IDs
+x<-Flux.Comp(Test_adj,IDs.to.analyse = 18,Gen_O2_int = FALSE)
 
-Test2<-Test[,-3]
-y<-Flux.Comp(Test2,IDs.to.analyse = 18:20,Filepathplot = "./Dummymap",Filepathresults = "./Dummymap/ID Testing")
+#Example running with multiple and full output
+y<-Flux.Comp(Test_adj,IDs.to.analyse = 19:20,Gen_O2_int = FALSE,Filepathplot = "./Dummymap",Filepathresults = "./Dummymap/ID Testing",
+             Full.Output = TRUE)
 
-args(Flux.Comp)
+

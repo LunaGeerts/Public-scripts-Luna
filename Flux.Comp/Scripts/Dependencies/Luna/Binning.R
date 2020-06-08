@@ -4,7 +4,7 @@
 #
 #
 #
-#
+#20/3/2020 changed line 133 to compute MEDIAN instead of mean, mean gives slightly OFF values
 
 
 
@@ -130,7 +130,7 @@ while (diff.C < percentile) {
 #there where the difference in C was bigger than the percentile given
   
 
-For.Bin$x[i]     <- mean(input.f$x[j: (j+counter) ])  
+For.Bin$x[i]     <- median(input.f$x[j: (j+counter) ])  
 For.Bin$C[i]     <- mean(input.f$C[j: (j+counter) ])  
 
 #Trying with geometric mean which is given as the product of every data point

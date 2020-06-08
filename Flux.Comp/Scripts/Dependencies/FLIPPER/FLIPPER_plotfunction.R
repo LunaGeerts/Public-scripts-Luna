@@ -1,6 +1,8 @@
 
 plot.continuous <- function(depth, conc, modelfit, R.int=NULL, y.limits = NULL, 
-                    prod.limits = NULL, flux.limits = NULL, conc.limits = NULL){
+                    prod.limits = NULL, flux.limits = NULL, conc.limits = NULL,
+                    TRUE_FLUX=FALSE #Luna Added this argument 19/4/2020
+                    ){
 
   flux         <- modelfit$J.tot
   prod         <- modelfit$R
@@ -18,6 +20,26 @@ plot.continuous <- function(depth, conc, modelfit, R.int=NULL, y.limits = NULL,
   
   par(new=F)
   
+  
+  
+  plot(x=prod, y=model.depth, ylim=y.limits, lwd=2, lty=2, 
+       xlab="",ylab="", axes=F, xlim = prod.limits, type="n")
+  axis(3, cex.axis=1.2, lwd=1.5)
+  
+  y1<- c(0,0,model.depth,max(model.depth))
+  x <- c(0,min(prod),prod,0)
+  
+
+  
+  polygon(x,y1, border=NA,  col=gray(level=0.95))
+   
+  lines(x=prod, y=model.depth, lwd=2, lty=2) 
+  lines(x=seq(0,0,length.out = length(model.depth)), y=seq(0,max(model.depth),length.out = length(model.depth))
+                                                         , lwd=1)
+  
+  par(new=T)
+  
+  
   plot(x=conc, y=depth, ylim=y.limits, pch=21, cex=1, bg=gray(level=0.2), xlab="",ylab="", axes=F,
        xlim = conc.limits)
   lines(x=modelfit[,2], y=modelfit[,1], lwd=2, lty=1, col="red")
@@ -25,28 +47,27 @@ plot.continuous <- function(depth, conc, modelfit, R.int=NULL, y.limits = NULL,
   axis(1, cex.axis=1.2, lwd=1.5, pos=par()$yaxp[1])
   #abline(h=par()$yaxp[1])
   
-  mtext(side=1, line=2.5, "Concentration", cex=1.5)
+  mtext(side=1, line=2, bquote(mmol ~O[2]~m^-3), cex=1.0)
   axis(2, cex.axis=1.2, lwd=1.5, pos=conc.limits[1])
-  mtext(side=2, line=1.5, "Depth", cex=1.5)
+  mtext(side=2, line=2, "Depth (meter)", cex=1.0)
   
-  abline(h=0, lty=1)  
-  
-  par(new=T)
-  
-  plot(x=prod, y=model.depth, ylim=y.limits, lwd=2, lty=2, 
-       xlab="",ylab="", axes=F, xlim = prod.limits, type="l")
+ # abline(h=0, lty=1)  
   
   
+   #abline(v=0)
   
-  #abline(v=0)
-  
-  axis(3, cex.axis=1.2, lwd=1.5)
   # abline(h=par()$yaxp[2])
-  mtext(text="Production", side=3, line=2.5, cex=1.5, lwd=1.5)
+  mtext(bquote(Production ~O[2]~m^-2~day^-1), side=3, line=2, cex=1, lwd=1.5)  
+  abline(h=0, lty=1) 
   
   if(!is.null(R.int)){
-  text(y=max(depth), x=mean(prod.limits), adj=c(0,0),
-       paste("Continuous method \nR.int =",round(R.int,3)), cex=1.5)}
+    text(y=max(depth), x=mean(conc.limits),
+         paste("FL_Con \nR.int =",round(R.int,3)), cex=1.5)}
+  
+  if(TRUE_FLUX){
+    R.int <- flux[1]
+      text(y=max(depth), x=mean(conc.limits),
+          paste("True Flux =",round(R.int,3)), cex=1.5)}
   
   
   
@@ -77,8 +98,7 @@ plot.discrete <- function(depth, conc, modelfit, prod, R.int=NULL,
   
   axis(3, cex.axis=1.2, lwd=1.5)
   # abline(h=par()$yaxp[2])
-  mtext(text="Production", side=3, line=2.5, cex=1.5, lwd=1.5)
-  
+  mtext(bquote(Production ~O[2]~m^-2~day^-1), side=3, line=2, cex=1, lwd=1.5)  
   
   par(new=T)
   
@@ -89,15 +109,15 @@ plot.discrete <- function(depth, conc, modelfit, prod, R.int=NULL,
   axis(1, cex.axis=1.2, lwd=1.5, pos=par()$yaxp[1])
   #abline(h=par()$yaxp[1])
   
-  mtext(side=1, line=2.5, "Concentration", cex=1.5)
+  mtext(side=1, line=2, bquote(mmol ~O[2]~m^-3), cex=1.0)
   axis(2, cex.axis=1.2, lwd=1.5, pos=conc.limits[1])
-  mtext(side=2, line=1.5, "Depth", cex=1.5)
+  mtext(side=2, line=2, "Depth (meter)", cex=1.0)
   
   abline(h=0, lty=1)  
  
    if(!is.null(R.int)){
-    text(y=max(depth), x=mean(conc.limits), adj=c(0,0), 
-         paste("Discrete method \nR.int =",round(R.int,3)), cex=1.5)}
+    text(y=max(depth), x=mean(conc.limits),
+         paste("FL_Disc \nR.int =",round(R.int,3)), cex=1.5)}
   
  
 }
@@ -123,15 +143,16 @@ plot.gradient <- function(depth, conc, modelfit, R.int=NULL,
   axis(1, cex.axis=1.2, lwd=1.5, pos=par()$yaxp[1])
   #abline(h=par()$yaxp[1])
   
-  mtext(side=1, line=2.5, "Concentration", cex=1.5)
+  mtext(side=1, line=2, bquote(mmol ~O[2]~m^-3), cex=1.0)
   axis(2, cex.axis=1.2, lwd=1.5, pos=conc.limits[1])
-  mtext(side=2, line=1.5, "Depth", cex=1.5)
+  mtext(side=2, line=2, "Depth (meter)", cex=1.0)
+  
   
   abline(h=0, lty=1)  
   
   if(!is.null(R.int)){
-    text(y=max(depth), x=mean(conc.limits), adj=c(0,0),
-         paste("Gradient method \nR.int =",round(R.int,3)), cex=1.5)}
+    text(y=max(depth), x=mean(conc.limits),
+         paste("FL_Grad \nR.int =",round(R.int,3)), cex=1.5)}
   
   
 }
@@ -199,7 +220,9 @@ try({    modelfit <- result$output$continuous$overview[,c("x","C","J.tot","R.vol
     R.int    <- result$output$continuous$R.int
     
     plot.continuous(depth,conc,modelfit,R.int)
-   })
+    
+   
+       })
     }
     
  }

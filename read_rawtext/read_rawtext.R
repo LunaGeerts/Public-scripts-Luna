@@ -31,7 +31,7 @@ read.rawtext<-function(file,skiptill="*/", ...){
 
 #First read the input text file, line by line and determine on which row we have an "*/"
 line.temp   <-  readLines(file)
-del.row   <-  which(line.temp=="*/")
+del.row   <-  which(line.temp==skiptill)
 
 
 #read the data frame skipping till the row containing "*/"

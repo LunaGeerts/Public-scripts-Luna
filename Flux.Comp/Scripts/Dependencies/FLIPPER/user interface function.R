@@ -59,9 +59,10 @@ generate.default.parms <- function(input,species,set){
    LBC       <- "no.flux"
    flux.up   <- NULL
    flux.down <- NULL
+   interaction <- TRUE
    discrete.parms.default <- list(L.down = L.down, x.up = x.up, irr = irr, irr.att = irr.att,
                                  prob = prob, UBC = UBC, LBC = LBC, flux.up = flux.up, flux.down = flux.down,
-                                 N = N, i.end = i.end, initial.zones = initial.zones)
+                                 N = N, i.end = i.end, initial.zones = initial.zones,interaction = interaction)
    
   return(discrete.parms.default) 
  }
@@ -373,7 +374,7 @@ if (continuous.parms$max.n == nrow(input)%/%2-1){
 # ---------------------
 
   if (method == "discrete"){
-    output.pr <- fit.profile(input=input,parms=discrete.parms,i.end=discrete.parms$i.end,initial.zones=discrete.parms$initial.zones, full.output = full.output)
+    output.pr <- fit.profile(input=input,parms=discrete.parms,i.end=discrete.parms$i.end,initial.zones=discrete.parms$initial.zones, full.output = full.output, interaction = discrete.parms$interaction)
     return(list("method" = method,"input" = input, "output" = output.pr, "parms" = list("env.parms" = env.parms, "discrete.parms" = discrete.parms)))
     
   }
@@ -407,7 +408,7 @@ if (continuous.parms$max.n == nrow(input)%/%2-1){
     
     print("Run discrete method")
     # Run and save discrete method  
-    output.ds <- try(fit.profile(input=input,parms=discrete.parms,i.end=discrete.parms$i.end,initial.zones=discrete.parms$initial.zones, full.output = full.output))
+    output.ds <- try(fit.profile(input=input,parms=discrete.parms,i.end=discrete.parms$i.end,initial.zones=discrete.parms$initial.zones, full.output = full.output, interaction = discrete.parms$interaction))
     
     print("Run continuous method")
     # Run and save continuous method  

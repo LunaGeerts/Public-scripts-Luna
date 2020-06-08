@@ -2,6 +2,10 @@
 #Example of Gen.O2.Profile
 ######################################################
 
+source("Gen_O2_Profile.R")
+
+# 500 data points (N), length of 0.01 meter (L) and with a flux at the top of -2 mmol m^-2 d^-1, porosity of 0.8 and temp
+# 10 celsius:
 
 y<-Gen.O2.Profile(N=500,L=0.01,Flux.top =2 ,por = 0.8,T=10)
 
@@ -23,7 +27,7 @@ lapply(d,function(x) {plot(x.cor~C,
                            ylim=rev(range(x.cor)),
                            main="example profile",xlab="mmol m^-3 O2",ylab="micrometer",type="p")
   text(x=max(x$C),pos=4,labels=paste(x$True.Flux,"True flux"))
- } )
+ })
 par(mfrow=c(1,1))
 
 

@@ -72,7 +72,7 @@ ZeroDepthcor<-function(dataframename,depthname,oxygen){
    
     cor                      <- locator(n=1)$y
     nulldepth                <- Closest(depthname[ID==i],cor[1])
-    dataframename$depth.cor[ID==i] <- depthname[ID==i]-nulldepth
+    dataframename$x.cor[ID==i] <- depthname[ID==i]-nulldepth
     
 
     

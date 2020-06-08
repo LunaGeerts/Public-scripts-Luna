@@ -7,7 +7,7 @@
 ##  Written by: Luna Geerts
 ##  Contact: Luna.Geerts@hotmail.com 
 ##  
-##  version 1.0
+##  version 1.1
 ##
 ################################################################################
 #NOTES
@@ -22,6 +22,13 @@
 
 
 #The output can be directly plugged in into flux.comp !
+
+
+#----------------------------------------------------------
+# 1.1 notes 30/3/2020
+#----------------------------------------------------------
+
+#Fixed error handling when flux and overlying water is given, also overlying water concentration can now be given
 
 #############################################################
 # libraries needed
@@ -95,7 +102,7 @@ Gen.O2.Profile<- function(N,                       # #datapoints
 
 if(is.null(O2.ow)) {water.given<-FALSE } else {water.given<-TRUE}
   if(is.null(Flux.top&O2.ow))  {warning(paste("Neither flux or concentration water given, will assume water concentration of 250 mmol m^-3 "))}
-if(!is.null(Flux.top)&!is.null(O2.ow)) {warning(paste("Both flux and concentration specified will continue with flux"))}
+if(!is.null(Flux.top)&!is.null(O2.ow)) {stop(paste("Both flux and concentration specified omit one"))}
   
 
 if(!is.null(Flux.top))  {Flux.top<-sqrt(Flux.top^2)} #so that the input variable is always positive
@@ -120,7 +127,7 @@ O2.model<- function(time,state,parms){
     }else if(!is.null( O2.ow)){    
       tran.O2        <- tran.1D(C=O2,
                                 C.down = 0, #since all oxygen is used up at the end of our modelled block aka no flux out
-                                C.up  = Flux.top ,
+                                C.up  = O2.ow ,
                                 D     = Grid.Ds,
                                 VF    = Grid.por,
                                 dx    = Grid)$dC
@@ -196,8 +203,6 @@ if (steady.state.reached) {O2.SS <- out$y} else stop
 if (steady.state.reached) {Prod.SS <- out$production} else stop
 
 
-#in units mmol per liter or micromol per square cm
-
 
 if (water.given)
   {
@@ -215,7 +220,7 @@ Gen.oxygenprofile<-data.frame(ID     = 1,
                               x.cor  = Grid$x.mid*10^6,
                               C      = O2.SS,
                               Por    = por,
-                              T      = TC,
+                              TC     = TC,
                               S      = S,
                               P      = P,
                               Author = "Luna.gen profile",

@@ -13,6 +13,14 @@ require(marelac)
 require(FME)
 source("./Scripts/Dependencies/FLIPPER/fittingfuncs/user_input.R")
 
+#==============================================================================
+#changes Luna
+#==============================================================================
+#line 165, changed maxzones to 12
+#added line in output so guessed zones is added to the output.
+#added option so the function is interactive or not
+
+
 # =============================================================================
 # 1. Basic diagenetic model => calculates C or Prod based on 1 set of C or P
 # =============================================================================
@@ -155,7 +163,7 @@ Ftest.profile <- function(nzones1,nzones2, SSE1, SSE2, N){
 # Interactive question; adapted from http://www.r-bloggers.com/user-input-using-tcltk/
 # Laurine
 # ========================================================
-PROFILE.interactive <- function(maxzone=10, guess=4){
+PROFILE.interactive <- function(maxzone=12, guess=4){ #Luna 17/4/2020 changed 10 to 12
   
   varEntryDialog(vars=c('Number of Zones'), 
                  labels=paste("Choose number of zones between 1 and",maxzone,"\n PROFILE proposes:",guess), fun=c(
@@ -274,6 +282,7 @@ fit.profile <- function(input,
                         i.end         = 12, 
                         initial.zones = NULL,
                         full.output,
+                        interaction=TRUE , # Luna: Added argument which circumvents plotting / interaction with user
                         ...){
   
   # Read depth and concentration from input file 
@@ -438,7 +447,7 @@ fit.profile <- function(input,
     Significant.zones <- Zone.lump$Zones[Zone.lump$p.value < 0.01]
     
     final.zones       <- max(Significant.zones)
-    
+    if (interaction) { #Added by Luna 14/5/2020, messy way to circumvent interaction
     x11(height = 20,width=40)
     par(mfrow=c(2,4))
     for(i in max(c(1,(final.zones-3))): min(c((final.zones+3),GUESS.zone))){
@@ -454,7 +463,7 @@ fit.profile <- function(input,
     }
     
     final.zones <- PROFILE.interactive(maxzone=GUESS.zone, guess=final.zones)[[1]]
-    dev.off()
+    dev.off()}
   }
   else{
     final.zones            <- GUESS.zone
@@ -488,7 +497,7 @@ fit.profile <- function(input,
       profile.output$SSR      <- SSR2[SSR2$zones==final.zones,"ssr"]
       profile.output$R.square <- SSR2[SSR2$zones==final.zones,"Rsquare"]
       profile.output$Zone.Table <- Zone.table
-      
+      profile.output$Initial.N <- GUESS.zone
       return(profile.output)
     }
   

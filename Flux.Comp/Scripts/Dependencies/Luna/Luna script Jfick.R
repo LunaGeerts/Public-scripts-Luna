@@ -289,7 +289,9 @@ Jfick     <-function(Dataframename,
 #using our temporary dataframe we will construct the plot on which the user selects two points for slope calculation
 #However we need to construct two linear regressions since we do not want the slope where concentration is in function of
 #Depth but the other way around (reversed to what the plot makes you believe)
-    plot(df.int$x~df.int$C, ylim=rev(range(df.int$x)), 
+   
+    if (is.null(FLIPPER)){
+     plot(df.int$x~df.int$C, ylim=rev(range(df.int$x)), 
          main = paste("Oxygen profile from ID",i),
          xlab = "", 
          ylab = bquote("Depth"~mu~"meter"))
@@ -299,7 +301,7 @@ Jfick     <-function(Dataframename,
     abline (1,0)
     
     points(df.int$C[df.int$x==0], df.int$x[df.int$x==0], col="green",
-           cex = 2, pch = 21, bg = "red")
+           cex = 2, pch = 21, bg = "red")}
     if (!is.null(FLIPPER)){
       
       
@@ -364,9 +366,9 @@ Jfick     <-function(Dataframename,
     
     visualfit <-  lm(x~C,
                      data =df.int[which(df.int$x <= point1[2] & df.int$x >= point2[2]),])
-    
+   if (is.null(FLIPPER)){
     abline(visualfit,col="red",lty=2,lwd=2)
-   
+   }
 #we do not want to plot the legend if FLIPPER is to be compared (within the same plot or in R), if you still want to save
     #the plot then the legend will be plotted regardless
   if (is.null(FLIPPER)){

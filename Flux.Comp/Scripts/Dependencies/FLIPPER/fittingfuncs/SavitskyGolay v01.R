@@ -8,6 +8,18 @@
 # from concentration depth profiles in aquatic sediments. 
 ################################################################################
 
+################################################################################
+#Version 0.2 - LUNA EDIT
+################################################################################
+
+# I adjusted code at line 305-ish named "LUNA EDIT"
+# in some ocassions the resulting differencing resulted in two numbers.
+# this is cause interpolation (which is part of FLIPPER) does not quite make "exactly" produce the same numbers as a result
+# The interpolated numbers can differ at the 19th or so decimal place, when you are unfortunate enough (like I was)
+# that at this point
+# A differencing would result in a wrong rounding e.g. when difference between two numbers and the subsequent rounding
+# 1.49 vs 1.50 results in 1 and 2 respectively you get an error
+
 require(signal)
 require(fractaldim)
 
@@ -289,7 +301,12 @@ SavGolay.analysis <- function(profile,
   # Filter distance
   #=============================================================================
   
-  h <- unique(signif(diff(profile$x),digits=2))
+  #h <- unique(signif(diff(profile$x),digits=2))
+  #LUNA EDIT
+  h<- unique(signif( diff(
+    signif(profile$x,15) #Round the input values first before differencing
+                                    ,digits=2)))
+  
   if (length(h)>1) stop("data points are not at equidistant depth intervals")
   
   #=============================================================================

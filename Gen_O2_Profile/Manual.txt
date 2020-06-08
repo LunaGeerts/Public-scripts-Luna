@@ -19,7 +19,7 @@ The other arguments are optional
 
 S,P and TC are all inputs to derive the diffusion coefficient , see package "marelac" for more info
 Ks is the half saturation constant given in mmol m^-3
-R.O2 is the consumption rate in mmol m^-3 day^-1
+R.O2 is the microbial consumption rate used mmol m^-3 day^-1
 
 
 OUTPUT:
@@ -33,4 +33,6 @@ T temperature in celsius
 S salinity
 P pressure in pascale
 Author = "Luna.gen profile" indicating its an generated profile
+RO2 values used
 True.Flux , either the inputted flux or the flux calculated from steady state when concentration of the overlying water is given
+and the production for that datapoint, which is the result of the concentration at that point and the microbial consumption rate following a Monod dependence
